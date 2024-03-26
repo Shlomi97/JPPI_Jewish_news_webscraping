@@ -1,5 +1,6 @@
 import logging
 import requests
+import os
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
@@ -27,3 +28,11 @@ def get_html_content(url: str):
     except requests.exceptions.RequestException as e:
         logging.error(f"Failed to fetch webpage content. Error: {e}")
         return None
+
+
+def read_existing_data(file_path: str, columns=("date", "title", "content", "urls", "tags", "authors")):
+    """Read existing data from CSV file."""
+    if os.path.exists(file_path):
+        return pd.read_csv(file_path)
+    else:
+        return pd.DataFrame(columns=columns)
