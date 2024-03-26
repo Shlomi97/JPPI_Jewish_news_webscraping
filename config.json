@@ -1,0 +1,10 @@
+{
+  "logging_level": "INFO",
+  "websites": {
+    "jta": {
+      "base_url": "https://www.jta.org/",
+      "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\jta_articles.csv"
+    }
+  },
+  "n": 5
+}
