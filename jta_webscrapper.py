@@ -6,7 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
-from utills import get_html_content
+from utills import get_html_content, read_existing_data
 
 
 def generate_page_urls(base_url: str, n: int,
@@ -19,7 +19,7 @@ def generate_page_urls(base_url: str, n: int,
     return urls
 
 
-def get_articles_urls_from_page(page_url) -> list:
+def get_articles_urls_from_page_jta(page_url) -> list:
     page_content = get_html_content(page_url)
     soup = BeautifulSoup(page_content, "html.parser")
     urls = soup.find_all('h2', class_='entry-title content-meta__title')
@@ -44,9 +44,14 @@ def get_full_article_jta(article_page) -> str:
     return full_text.replace('\n', '').replace('\t', ' ')
 
 
-def get_author_jta(article_page) -> str:
-    author = article_page.find(class_="post-info__oped-name").text.strip()
-    return author
+def get_author_jta(article_page: BeautifulSoup) -> str:
+    author_element = article_page.find(class_="post-info__oped-name")
+    if not author_element:
+        author_element = article_page.find(class_="-underlined-yellow")
+    if author_element:
+        author = author_element.text.strip()
+    else:
+        author = "Author not found"
 
 
 def get_tags_jta(article_page) -> str:
@@ -82,7 +87,7 @@ def process_article(df, article_url):
 
     return df
 
-def fetch_all_data_jta(base_url, n, file_path='jta.csv'):
+def fetch_all_data_jta(base_url, n, file_path='jta'):
     """Fetch data from pages and articles."""
     df = read_existing_data(file_path)
     generated_urls = generate_page_urls(base_url, n)

@@ -15,6 +15,7 @@ def main():
     for key, site in config["websites"].items():
         base_url = site["base_url"]
         output_path = site["output_path"]
+        print(output_path)
         n = config["n"]
 
         if key == 'jta':

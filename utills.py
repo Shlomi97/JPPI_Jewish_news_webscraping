@@ -3,6 +3,7 @@ import requests
 import os
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+import pandas as pd
 
 # Configure the logging settings
 logging.basicConfig(filename='scraping_log.txt', level=logging.INFO,
