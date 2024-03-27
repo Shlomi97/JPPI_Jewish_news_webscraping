@@ -1,6 +1,7 @@
 import json
 import logging
 from jta_webscrapper import fetch_all_data_jta
+from forward_webscrapper import fetch_all_data_forward
 
 
 def main():
@@ -20,3 +21,5 @@ def main():
 
         if key == 'jta':
             fetch_all_data_jta(base_url, n, output_path)
+        if key =='forward':
+            fetch_all_data_forward(base_url,output_path)
