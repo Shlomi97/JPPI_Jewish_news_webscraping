@@ -1,19 +1,19 @@
 import logging
 import time
 import pandas as pd
+from os.path import exists
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import ElementClickInterceptedException, TimeoutException
-# Assuming get_html_content and read_existing_data are defined in 'utills.py' correctly
 from utills import get_html_content
 
 
-def fetch_new_article_urls_until_known(existing_urls):
+def fetch_new_article_urls_until_known(base_url,existing_urls):
     driver = webdriver.Chrome()  # Adjust the path if necessary
-    driver.get("https://forward.com/news/")
+    driver.get(base_url)
     known_urls = set(existing_urls)  # Set of known URLs for fast lookup
     new_urls = set()  # Set to collect new URLs
     max_attempts = 5  # Adjust based on how many times you want to click "Load More"
@@ -123,3 +123,20 @@ def process_article(df, article_url):
         logging.warning(f"Failed to fetch content from article URL: {article_url}")
     time.sleep(2)
     return df
+
+
+def fetch_all_data_forward(base_url, file_path='forward.csv'):
+    # Check if the file exists to load existing data
+    if exists(file_path):
+        df_existing = pd.read_csv(file_path)
+        existing_urls = df_existing['urls'].tolist()
+    else:
+        df_existing = pd.DataFrame(columns=["date", "title", "category", "content", "urls", "tags", "authors"])
+        existing_urls = []
+    new_urls = fetch_new_article_urls_until_known(base_url,existing_urls)
+    df_new = pd.DataFrame(columns=["date", "title", "category", "content", "urls", "tags", "authors"])
+    for url in new_urls:
+        df_new = process_article(df_new, url)
+    df_combined = pd.concat([df_existing, df_new]).drop_duplicates(subset=['urls']).reset_index(drop=True)
+    df_combined.to_csv(file_path, index=False)
+    print(f"Updated data saved to {file_path}. Total records: {len(df_combined)}")
