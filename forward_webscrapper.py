@@ -11,7 +11,7 @@ from selenium.common.exceptions import ElementClickInterceptedException, Timeout
 from utills import get_html_content
 
 
-def fetch_new_article_urls_until_known(base_url,existing_urls):
+def fetch_new_article_urls_until_known(base_url, existing_urls):
     driver = webdriver.Chrome()  # Adjust the path if necessary
     driver.get(base_url)
     articles_urls = []  # Initialize as a list for preserving order
@@ -60,7 +60,8 @@ def fetch_new_article_urls_until_known(base_url,existing_urls):
         # Remove duplicates while preserving order
         articles_urls = list(dict.fromkeys(articles_urls))
         driver.quit()  # Make sure to quit the driver to close the browser window
-    return  articles_urls
+    return articles_urls
+
 
 def get_title_forward(article_page):
     title_element = article_page.find('h1', class_="heading-2")
@@ -77,18 +78,26 @@ def get_tags_forward(article_page) -> list:
     return [tag.text.strip() for tag in tags_element.find_all("li")] if tags_element else ["No Tags"]
 
 
-def get_author_forward(article_page):
-    author_element = article_page.find("div", class_="post-author no-avatar") or article_page.find("div",
-                                                                                                   class_="post-author single")
-    author_link = author_element.find('a') if author_element else None
-    return author_link.text.strip() if author_link else "Could not get author name"
+def get_authors_forward(article_page) -> list:
+    # Use CSS selector to find all divs where class starts with "post-author"
+    author_elements = article_page.select('div[class^="post-author"]')
+    authors = []
+    for author_element in author_elements:
+        authors_links = author_element.find_all('a')
+        for author_link in authors_links:
+            authors.append(author_link.text.strip())
+    return authors
 
 
 def get_date_forward(article_page):
-    date_element = article_page.find("div", class_="post-author no-avatar") or article_page.find("div",
-                                                                                                 class_="post-author single")
-    date_span = date_element.find('span') if date_element else None
-    return date_span.text.strip() if date_span else "Could not get article date"
+    # Use CSS selector to find the first div where class starts with "post-author"
+    author_element = article_page.select_one('div[class^="post-author"]')
+    if author_element:
+        date_element = author_element.find_all('span')[-1]
+        if date_element:  # Ensure there's an <a> tag
+            return date_element.text.strip()
+
+    return "Could not get article date"
 
 
 def get_full_article_forward(article_page):
@@ -107,7 +116,7 @@ def process_article(df, article_url):
         content = get_full_article_forward(soup)
         date = get_date_forward(soup)
         tags = get_tags_forward(soup)
-        authors = get_author_forward(soup)
+        authors = get_authors_forward(soup)
 
         new_row = {
             "date": date,
@@ -135,7 +144,7 @@ def fetch_all_data_forward(base_url, file_path='forward.csv'):
     else:
         df_existing = pd.DataFrame(columns=["date", "title", "category", "content", "urls", "tags", "authors"])
         existing_urls = []
-    new_urls = fetch_new_article_urls_until_known(base_url,existing_urls)
+    new_urls = fetch_new_article_urls_until_known(base_url, existing_urls)
     df_new = pd.DataFrame(columns=["date", "title", "category", "content", "urls", "tags", "authors"])
     for url in new_urls:
         df_new = process_article(df_new, url)
