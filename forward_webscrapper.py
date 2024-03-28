@@ -14,20 +14,21 @@ from utills import get_html_content
 def fetch_new_article_urls_until_known(base_url,existing_urls):
     driver = webdriver.Chrome()  # Adjust the path if necessary
     driver.get(base_url)
-    known_urls = set(existing_urls)  # Set of known URLs for fast lookup
-    new_urls = set()  # Set to collect new URLs
+    articles_urls = []  # Initialize as a list for preserving order
+    click_attempts = 0
     max_attempts = 5  # Adjust based on how many times you want to click "Load More"
 
     try:
-        while True:
+        while click_attempts < max_attempts:
             try:
                 # Wait for the "Load More" button to be clickable and click it
                 load_more_button = WebDriverWait(driver, 10).until(
                     EC.element_to_be_clickable((By.CSS_SELECTOR, ".alm-load-more-btn.more"))
                 )
                 driver.execute_script("arguments[0].scrollIntoView(true);", load_more_button)
-                driver.execute_script("window.scrollBy(0, -150);")  # Adjust scrolling as necessary
+                driver.execute_script("window.scrollBy(0, -150);")  # Scroll up a bit if needed
                 load_more_button.click()
+                click_attempts += 1
 
                 # Wait for a short period to ensure new content has loaded
                 WebDriverWait(driver, 10).until(
@@ -35,30 +36,31 @@ def fetch_new_article_urls_until_known(base_url,existing_urls):
                 )
 
             except ElementClickInterceptedException:
-                # If still not clickable, use JavaScript to click
+                # If still not clickable after the scroll, wait a bit and try clicking again
+                time.sleep(2)  # Optional sleep, can adjust based on behavior
                 driver.execute_script("arguments[0].click();", load_more_button)
-            except TimeoutException:
-                print("Timed out waiting for more articles to load or no more 'Load More' button.")
-                break
 
-            # Fetch new URLs and check each one
+            # Fetch new URLs
             urls_elements = driver.find_elements(By.CSS_SELECTOR, "a.post.heading-image.news")
             for url_element in urls_elements:
                 url = url_element.get_attribute('href')
-                if url in known_urls:
-                    print("Encountered an already known URL. Stopping.")
-                    break  # Stop if the URL is known
+                if url in existing_urls:
+                    logging.warning(f"{url} already extracted, stopping the loop")
+                    break
                 else:
-                    new_urls.add(url)
+                    articles_urls.append(url_element.get_attribute('href'))
             else:
                 continue  # Only executed if the inner loop did NOT break
             break  # Break the outer loop if the inner loop was broken
 
+    except TimeoutException:
+        logging.warning(f"Reached the end of the page or encountered a timeout.")
+
     finally:
+        # Remove duplicates while preserving order
+        articles_urls = list(dict.fromkeys(articles_urls))
         driver.quit()  # Make sure to quit the driver to close the browser window
-
-    return list(new_urls)  # Convert the set of new URLs to a list before returning
-
+    return  articles_urls
 
 def get_title_forward(article_page):
     title_element = article_page.find('h1', class_="heading-2")
