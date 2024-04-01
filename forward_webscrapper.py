@@ -32,7 +32,7 @@ def fetch_new_article_urls_until_known(base_url, existing_urls):
 
                 # Wait for a short period to ensure new content has loaded
                 WebDriverWait(driver, 10).until(
-                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.post.heading-image.news"))
+                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.post.heading-image*"))
                 )
 
             except ElementClickInterceptedException:
@@ -41,7 +41,7 @@ def fetch_new_article_urls_until_known(base_url, existing_urls):
                 driver.execute_script("arguments[0].click();", load_more_button)
 
             # Fetch new URLs
-            urls_elements = driver.find_elements(By.CSS_SELECTOR, "a.post.heading-image.news")
+            urls_elements = driver.find_elements(By.CSS_SELECTOR, "a.post.heading-image*")
             for url_element in urls_elements:
                 url = url_element.get_attribute('href')
                 if url in existing_urls:
