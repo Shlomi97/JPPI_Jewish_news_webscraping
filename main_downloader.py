@@ -4,6 +4,7 @@ from jta_webscrapper import fetch_all_data_jta
 from forward_webscrapper import fetch_all_data_forward
 
 
+
 def main():
     # Load configuration
     with open('config.json', 'r') as config_file:
@@ -23,3 +24,6 @@ def main():
             fetch_all_data_jta(base_url, n, output_path)
         if key =='forward':
             fetch_all_data_forward(base_url,output_path)
+        if key =='forward_opinion':
+            fetch_all_data_forward(base_url, output_path)
+
