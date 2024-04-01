@@ -5,7 +5,7 @@
       "base_url": "https://www.jta.org/",
       "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\jta_articles.csv"
     },
-    "jta": {
+    "forward": {
       "base_url": "https://forward.com/news/",
       "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\forward_articles.csv"
     }

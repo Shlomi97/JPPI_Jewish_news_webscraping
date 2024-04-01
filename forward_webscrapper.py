@@ -151,3 +151,4 @@ def fetch_all_data_forward(base_url, file_path='forward.csv'):
     df_combined = pd.concat([df_existing, df_new]).drop_duplicates(subset=['urls']).reset_index(drop=True)
     df_combined.to_csv(file_path, index=False)
     print(f"Updated data saved to {file_path}. Total records: {len(df_combined)}")
+    logging.info(f"Script execution completed forward ")
