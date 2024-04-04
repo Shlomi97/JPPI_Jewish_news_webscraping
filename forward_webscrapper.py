@@ -32,7 +32,7 @@ def fetch_new_article_urls_until_known(base_url, existing_urls):
 
                 # Wait for a short period to ensure new content has loaded
                 WebDriverWait(driver, 10).until(
-                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.post.heading-image*"))
+                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.post"))
                 )
 
             except ElementClickInterceptedException:
@@ -40,26 +40,26 @@ def fetch_new_article_urls_until_known(base_url, existing_urls):
                 time.sleep(2)  # Optional sleep, can adjust based on behavior
                 driver.execute_script("arguments[0].click();", load_more_button)
 
-            # Fetch new URLs
-            urls_elements = driver.find_elements(By.CSS_SELECTOR, "a.post.heading-image*")
+            # Fetch new URLs with a more general selector
+            urls_elements = driver.find_elements(By.CSS_SELECTOR, "a.post")
+
+            # Filter elements programmatically
             for url_element in urls_elements:
-                url = url_element.get_attribute('href')
-                if url in existing_urls:
-                    logging.warning(f"{url} already extracted, stopping the loop")
-                    break
-                else:
-                    articles_urls.append(url_element.get_attribute('href'))
+                class_attribute = url_element.get_attribute('class')
+                if "heading-image" in class_attribute:  # Adjust the condition based on your requirements
+                    url = url_element.get_attribute('href')
+                    print(url)
+                    if url in existing_urls:
+                        logging.warning(f"{url} already extracted, stopping the loop")
+                        break
+                    else:
+                        articles_urls.append(url)
             else:
                 continue  # Only executed if the inner loop did NOT break
             break  # Break the outer loop if the inner loop was broken
-
-    except TimeoutException:
-        logging.warning(f"Reached the end of the page or encountered a timeout.")
-
     finally:
-        # Remove duplicates while preserving order
-        articles_urls = list(dict.fromkeys(articles_urls))
-        driver.quit()  # Make sure to quit the driver to close the browser window
+        driver.quit()  # Make sure to quit the driver to free up resources
+
     return articles_urls
 
 
@@ -148,7 +148,8 @@ def fetch_all_data_forward(base_url, file_path='forward.csv'):
     df_new = pd.DataFrame(columns=["date", "title", "category", "content", "urls", "tags", "authors"])
     for url in new_urls:
         df_new = process_article(df_new, url)
-    df_combined = pd.concat([df_existing, df_new]).drop_duplicates(subset=['urls']).reset_index(drop=True)
+    df_combined = pd.concat([df_new,df_existing],ignore_index=True).drop_duplicates(subset=['urls']).reset_index(drop=True)
+
     df_combined.to_csv(file_path, index=False)
     print(f"Updated data saved to {file_path}. Total records: {len(df_combined)}")
     logging.info(f"Script execution completed forward ")

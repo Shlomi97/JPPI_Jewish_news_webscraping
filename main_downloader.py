@@ -24,6 +24,6 @@ def main():
             fetch_all_data_jta(base_url, n, output_path)
         if key =='forward':
             fetch_all_data_forward(base_url,output_path)
-        if key =='forward_opinion':
-            fetch_all_data_forward(base_url, output_path)
+        # if key =='forward_opinion':
+        #     fetch_all_data_forward(base_url, output_path)
 

@@ -110,17 +110,17 @@ def fetch_all_data_jta(base_url, n, file_path='jta'):
                 break_outer_loop = True
                 break
             try:
-                df = process_article(df, article_url)
+                temp_df = process_article(temp_df, article_url)
             except Exception as e:
                 logging.error(f"Error processing article {article_url}: {e}")
         if break_outer_loop:
             break  # Break out of outer loop
-    temp_df['date'] = pd.to_datetime(temp_df['date']).dt.strftime('%d-%b-%y')
+    temp_df = temp_df.reset_index(drop=True)
     # Concatenate temp_df with df to maintain the correct order
-    df = pd.concat([temp_df, df], ignore_index=True)
+    df_combined = pd.concat([temp_df,df], ignore_index=True).reset_index(drop=True)
 
     # Save the final DataFrame to the specified file path
-    df.to_csv(file_path, index=False, encoding='utf-8')
+    df_combined.to_csv(file_path, index=False)
 
     logging.info("Script execution completed jta ")
 
