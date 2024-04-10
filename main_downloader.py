@@ -2,7 +2,7 @@ import json
 import logging
 from jta_webscrapper import fetch_all_data_jta
 from forward_webscrapper import fetch_all_data_forward
-
+from cjn_webscrapper import fetch_all_data_cjn
 
 
 def main():
@@ -22,8 +22,7 @@ def main():
 
         if key == 'jta':
             fetch_all_data_jta(base_url, n, output_path)
-        if key =='forward':
-            fetch_all_data_forward(base_url,output_path)
-        if key =='forward_opinion':
-             fetch_all_data_forward(base_url, output_path)
-
+        if key == 'forward':
+            fetch_all_data_forward(base_url, output_path)
+        if key == 'cjn':
+            fetch_all_data_cjn(base_url, output_path)

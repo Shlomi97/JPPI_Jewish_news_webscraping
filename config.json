@@ -8,6 +8,10 @@
     "forward": {
       "base_url": "https://forward.com/news/",
       "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\forward_articles.csv"
+    },
+    "cjn": {
+      "base_url": "https://thecjn.ca/news/",
+      "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\cjn_articles.csv"
     }
 
   },
