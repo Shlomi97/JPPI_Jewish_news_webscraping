@@ -1,12 +1,24 @@
-from os.path import exists
+import logging
+import os
 import time
+
+import pandas as pd
+import requests
 from bs4 import BeautifulSoup
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import ElementClickInterceptedException, TimeoutException
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
 from utills import get_html_content
+
+# Set up logging configuration
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 def fetch_new_article_urls_until_known(base_url, existing_urls):
@@ -55,3 +67,63 @@ def fetch_new_article_urls_until_known(base_url, existing_urls):
         driver.quit()
         print(f"Total unique articles collected: {len(articles_urls)}")
         return articles_urls
+
+
+def get_title_cjn(article_page):
+    title_element = article_page.find('h1', attrs={"itemprop": "headline"})
+
+    if title_element:
+        return title_element.get_text(strip=True)
+    else:
+        return "No Title"
+
+
+def get_author_cjn(article_page):
+    author_element = article_page.find('span', attrs={"itemprop": "name"})
+
+    if author_element:
+        return author_element.get_text(strip=True)
+    else:
+        return "No Author"
+
+
+def get_date_cjn(article_page):
+    date_element = article_page.find('time', attrs={"itemprop": "datePublished"})
+
+    if date_element:
+        return date_element.get_text(strip=True)
+    else:
+        return "No date"
+
+
+def get_full_article_cjn(article_page):
+    paragraphs = article_page.find(class_="single-main-content single-main-content--post").find_all("p")
+    full_text = ' '.join([paragraph.text.strip() for paragraph in paragraphs])
+    return full_text.replace('\n', '').replace('\t', ' ')
+
+
+def process_article(df, article_url):
+    """Process an article URL and add data to the DataFrame."""
+    logging.info(f"Scraping data from article URL: {article_url}")
+    article_page = get_html_content(article_url)
+    soup = BeautifulSoup(article_page, "html.parser")
+    if article_page is not None:
+        title = get_title_cjn(soup)
+        content = get_full_article_cjn(soup)
+        date = get_date_cjn(soup)
+        authors = get_authors_cjn(soup)
+        new_row = pd.DataFrame([{
+            "date": date,
+            "title": title,
+            "content": content,
+            "urls": article_url,
+            "authors": authors
+        }])
+        df = pd.concat([df, new_row], ignore_index=True)
+        print(f"Data for {article_url} added to DataFrame")
+        logging.info(f"Data for {article_url} added to DataFrame")
+        time.sleep(2)
+    else:
+        logging.warning(f"Failed to fetch content from article URL: {article_url}")
+
+    return df
