@@ -8,12 +8,8 @@
     "forward": {
       "base_url": "https://forward.com/news/",
       "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\forward_articles.csv"
-    },
-
-    "forward_opinion": {
-      "base_url": "https://forward.com/opinion/",
-      "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\forward_opinion_articles.csv"
     }
+
   },
   "n": 833
 }
