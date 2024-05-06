@@ -139,3 +139,22 @@ def process_article(df, article_url):
 
     return df
 
+
+def fetch_all_data_jewish_news(base_url, file_path='Jewish_news.csv'):
+    # Check if the file exists to load existing data
+    if exists(file_path):
+        df_existing = pd.read_csv(file_path)
+        existing_urls = df_existing['urls'].tolist()
+    else:
+        df_existing = pd.DataFrame(columns=["date", "title", "content", "urls", "tags", "authors"])
+        existing_urls = []
+    new_urls = fetch_new_article_urls_until_known(base_url, existing_urls)
+    df_new = pd.DataFrame(columns=["date", "title", "content", "urls", "tags", "authors"])
+    for url in new_urls:
+        df_new = process_article(df_new, url)
+    df_combined = pd.concat([df_new, df_existing], ignore_index=True).drop_duplicates(subset=['urls']).reset_index(
+        drop=True)
+
+    df_combined.to_csv(file_path, index=False)
+    print(f"Updated data saved to {file_path}. Total records: {len(df_combined)}")
+    logging.info(f"Script execution completed {file_path} ")
