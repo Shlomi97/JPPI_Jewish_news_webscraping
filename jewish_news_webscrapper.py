@@ -67,3 +67,75 @@ def fetch_new_article_urls_until_known(base_url, existing_urls):
         logging.info(f"Total new unique articles collected: {len(new_articles_urls)}")
         driver.quit()
         return new_articles_urls
+
+def get_title_jewish_news(article_page):
+    title_element = article_page.find( class_="headline")
+    return title_element.text.strip() if title_element else "No Title"
+
+
+def get_tags_jewish_news(article_page):
+    tags = []
+    topics_div = article_page.find("div", class_="article-topics")
+    if topics_div:
+        tag_links = topics_div.find_all("a")
+        for link in tag_links:
+            tags.append(link.text.strip())
+    return tags
+
+
+def get_authors_jewish_news(article_page):
+    authors = []
+    byline_div = article_page.find("div", class_="wrap-byline")
+    if byline_div:
+        author_links = byline_div.find_all("a", class_="byline-link")
+        for link in author_links:
+            authors.append(link.text.strip())
+    return authors
+
+def get_date_jewish_news(article_page):
+    date = "No Date"
+    byline_div = article_page.find("div", class_="wrap-byline")
+    if byline_div:
+        date_span = byline_div.find("span", class_="date")
+        if date_span:
+            date = date_span.text.strip()
+    return date
+
+def get_full_article_jewish_news(article_page):
+    content_div = article_page.find("div", class_="the-content")
+    if content_div:
+        # Extract all paragraphs, ignoring non-text elements and join them into a single string
+        paragraphs = content_div.find_all("p")
+        full_text = ' '.join(paragraph.text for paragraph in paragraphs if paragraph.text)
+        return full_text.replace('\n', ' ').replace('\t', ' ').strip()
+    else:
+        return "Article content not found."
+
+def process_article(df, article_url):
+    """Process a Jewish News article URL and add data to the DataFrame."""
+    logging.info(f"Scraping data from article URL: {article_url}")
+    article_page = get_html_content(article_url)
+    soup = BeautifulSoup(article_page, "html.parser")
+    if article_page is not None:
+        title = get_title_jewish_news(soup)
+        content = get_full_article_jewish_news(soup)
+        date = get_date_jewish_news(soup)
+        tags = get_tags_jewish_news(soup)
+        authors = get_authors_jewish_news(soup)
+        new_row = pd.DataFrame([{
+            "date": date,
+            "title": title,
+            "content": content,
+            "urls": article_url,
+            "tags": tags,
+            "authors": authors
+        }])
+        df = pd.concat([df, new_row], ignore_index=True)
+        print(f"Data for {article_url} added to DataFrame")
+        logging.info(f"Data for {article_url} added to DataFrame")
+        time.sleep(2)
+    else:
+        logging.warning(f"Failed to fetch content from article URL: {article_url}")
+
+    return df
+
