@@ -114,3 +114,49 @@ def process_article(df, article_url):
         logging.warning(f"Failed to fetch content from article URL: {article_url}")
 
     return df
+
+
+def fetch_all_data(base_url, file_path='jewish_ru.csv'):
+    """Fetch data from pages and articles."""
+    if exists(file_path):
+        df_existing = pd.read_csv(file_path)
+    else:
+        df_existing = pd.DataFrame(columns=["date", "title", "content", "urls", "category", "tags"])
+
+    last_article_num = extract_article_number(df_existing['url'].iloc[-1]) if len(df_existing) > 0 else 199000
+    print(last_article_num)
+    article_url = generate_article_url(base_url, last_article_num + 1)
+    df_new = pd.DataFrame(columns=["date", "title", "content", "urls", "category", "tags"])
+
+    consecutive_404_count = 0  # Track consecutive 404 errors
+
+    try:
+        while consecutive_404_count < 7:
+            print(article_url)
+            try:
+                df_new = process_article(df_new, article_url)
+                # Save the final DataFrame to the specified file path
+                consecutive_404_count = 0  # Reset counter upon successful fetch
+            except ValueError as ve:
+                if str(ve) == "404 Page Not Found":
+                    logging.info("404 Page encountered.")
+                    consecutive_404_count += 1
+                    if consecutive_404_count == 7:
+                        df = pd.concat([df_new, df_existing], ignore_index=True)
+                        break  # Exit loop if three consecutive 404 errors occur
+            except KeyboardInterrupt:
+                logging.info("Execution interrupted by the user.")
+                break
+            except Exception as e:
+                logging.error(f"An error occurred: {e}")
+
+            article_url = get_next_article_url(article_url, base_url)
+
+    except KeyboardInterrupt:
+        logging.info("Execution interrupted by the user.")
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+
+    logging.info("Script execution completed.")
+
+    return df
