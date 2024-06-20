@@ -12,7 +12,16 @@
     "cjn": {
       "base_url": "https://thecjn.ca/news/",
       "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\cjn_articles.csv"
+    },
+    "jewish_news": {
+      "base_url": "https://www.jewishnews.co.uk/latest/",
+      "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\jewish_news.csv"
+    },
+    "australian_jewish_news": {
+      "base_url": "https://www.australianjewishnews.com//latest/",
+      "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\australian_jewish_news.csv"
     }
+
 
   },
   "n": 833

@@ -68,8 +68,9 @@ def fetch_new_article_urls_until_known(base_url, existing_urls):
         driver.quit()
         return new_articles_urls
 
+
 def get_title_jewish_news(article_page):
-    title_element = article_page.find( class_="headline")
+    title_element = article_page.find(class_="headline")
     return title_element.text.strip() if title_element else "No Title"
 
 
@@ -92,6 +93,7 @@ def get_authors_jewish_news(article_page):
             authors.append(link.text.strip())
     return authors
 
+
 def get_date_jewish_news(article_page):
     date = "No Date"
     byline_div = article_page.find("div", class_="wrap-byline")
@@ -100,6 +102,7 @@ def get_date_jewish_news(article_page):
         if date_span:
             date = date_span.text.strip()
     return date
+
 
 def get_full_article_jewish_news(article_page):
     content_div = article_page.find("div", class_="the-content")
@@ -110,6 +113,7 @@ def get_full_article_jewish_news(article_page):
         return full_text.replace('\n', ' ').replace('\t', ' ').strip()
     else:
         return "Article content not found."
+
 
 def process_article(df, article_url):
     """Process a Jewish News article URL and add data to the DataFrame."""

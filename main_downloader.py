@@ -3,6 +3,7 @@ import logging
 from jta_webscrapper import fetch_all_data_jta
 from forward_webscrapper import fetch_all_data_forward
 from cjn_webscrapper import fetch_all_data_cjn
+from jewish_news_webscrapper import fetch_all_data_jewish_news
 
 
 def main():
@@ -26,3 +27,7 @@ def main():
             fetch_all_data_forward(base_url, output_path)
         if key == 'cjn':
             fetch_all_data_cjn(base_url, output_path)
+        if key == 'jewish_news':
+            fetch_all_data_jewish_news(base_url, output_path)
+        if key == "australian_jewish_news":
+            fetch_all_data_jewish_news(base_url, output_path)

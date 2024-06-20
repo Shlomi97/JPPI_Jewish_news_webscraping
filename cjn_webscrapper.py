@@ -111,7 +111,7 @@ def process_article(df, article_url):
         title = get_title_cjn(soup)
         content = get_full_article_cjn(soup)
         date = get_date_cjn(soup)
-        authors = get_authors_cjn(soup)
+        authors = get_author_cjn(soup)
         new_row = pd.DataFrame([{
             "date": date,
             "title": title,
