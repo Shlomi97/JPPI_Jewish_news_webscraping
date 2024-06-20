@@ -31,13 +31,6 @@ def get_next_article_url(current_url: str, base_url: str) -> str:
     return next_article_url
 
 
-def get_next_article_url(current_url: str, base_url: str) -> str:
-    current_article_number = extract_article_number(current_url)
-    next_article_number = current_article_number + 1
-    next_article_url = generate_article_url(base_url, next_article_number)
-    return next_article_url
-
-
 def get_article_date(article_page) -> str:
     date_element = article_page.find('p', class_='date')
     if date_element:
@@ -116,7 +109,7 @@ def process_article(df, article_url):
     return df
 
 
-def fetch_all_data(base_url, file_path='jewish_ru.csv'):
+def fetch_all_data_jewish_ru(base_url, file_path='jewish_ru.csv'):
     """Fetch data from pages and articles."""
     if exists(file_path):
         df_existing = pd.read_csv(file_path)

@@ -20,6 +20,10 @@
     "australian_jewish_news": {
       "base_url": "https://www.australianjewishnews.com//latest/",
       "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\australian_jewish_news.csv"
+    },
+    "jewish_ru": {
+      "base_url": "https://jewish.ru/ru/news/articles/",
+      "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\jewish_ru_news.csv"
     }
 
 

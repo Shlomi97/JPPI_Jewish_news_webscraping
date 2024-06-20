@@ -4,6 +4,7 @@ from jta_webscrapper import fetch_all_data_jta
 from forward_webscrapper import fetch_all_data_forward
 from cjn_webscrapper import fetch_all_data_cjn
 from jewish_news_webscrapper import fetch_all_data_jewish_news
+from jewish_ru import  fetch_all_data_jewish_ru
 
 
 def main():
