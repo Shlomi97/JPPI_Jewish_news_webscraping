@@ -32,3 +32,5 @@ def main():
             fetch_all_data_jewish_news(base_url, output_path)
         if key == "australian_jewish_news":
             fetch_all_data_jewish_news(base_url, output_path)
+        if key == "jewish_ru":
+            fetch_all_data_jewish_ru(base_url, output_path)
