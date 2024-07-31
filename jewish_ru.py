@@ -114,9 +114,9 @@ def fetch_all_data_jewish_ru(base_url, file_path='jewish_ru.csv'):
     if exists(file_path):
         df_existing = pd.read_csv(file_path)
     else:
-        df_existing = pd.DataFrame(columns=["date", "title", "content", "urls", "category", "tags"])
+        df_existing = pd.DataFrame(columns=["date", "title", "content", "url", "category", "tags"])
 
-    last_article_num = extract_article_number(df_existing['url'].iloc[-1]) if len(df_existing) > 0 else 199000
+    last_article_num = extract_article_number(df_existing['urls'].iloc[0]) if len(df_existing) > 0 else 199000
     print(last_article_num)
     article_url = generate_article_url(base_url, last_article_num + 1)
     df_new = pd.DataFrame(columns=["date", "title", "content", "urls", "category", "tags"])
@@ -150,7 +150,9 @@ def fetch_all_data_jewish_ru(base_url, file_path='jewish_ru.csv'):
         logging.info("Execution interrupted by the user.")
     except Exception as e:
         logging.error(f"An error occurred: {e}")
+    df.to_csv(file_path, index=False)
+    print(f"Updated data saved to {file_path}. Total records: {len(df)}")
+    logging.info(f"Script execution complete jewish_ru")
 
-    logging.info("Script execution completed.")
 
     return df

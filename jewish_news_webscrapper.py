@@ -119,8 +119,8 @@ def process_article(df, article_url):
     """Process a Jewish News article URL and add data to the DataFrame."""
     logging.info(f"Scraping data from article URL: {article_url}")
     article_page = get_html_content(article_url)
-    soup = BeautifulSoup(article_page, "html.parser")
     if article_page is not None:
+        soup = BeautifulSoup(article_page, "html.parser")
         title = get_title_jewish_news(soup)
         content = get_full_article_jewish_news(soup)
         date = get_date_jewish_news(soup)
