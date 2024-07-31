@@ -92,3 +92,93 @@ def fetch_monthly_urls(url, existing_urls=[]):
     driver.quit()
 
     return urls
+
+
+def get_title(article_page):
+    # Find the <h1> element with the class and itemprop attributes
+    title_element = article_page.find('h1', class_='mvp-post-title', attrs={"itemprop": "headline"})
+
+    if title_element:
+        return title_element.get_text(strip=True)
+    else:
+        return "No Title"
+
+
+def get_date(article_page):
+    # Find the <time> element with the itemprop attribute and class name containing 'post-date'
+    date_element = article_page.find('time', attrs={"itemprop": "datePublished"})
+
+    if date_element and 'post-date' in date_element.get('class', []):
+        return date_element.get_text(strip=True)
+    else:
+        return "No date"
+
+
+def get_article_category(article_page) -> str:
+    # Find the <h3> element with the class "mvp-post-cat"
+    category_element = article_page.find('h3', class_='mvp-post-cat')
+
+    if category_element:
+        # Find the <span> within the <a> tag inside the <h3>
+        category_span = category_element.find('span', class_='mvp-post-cat')
+        if category_span:
+            return category_span.text.strip()
+
+    return "No category available"
+
+
+def get_article_tags(article_page) -> list:
+    tags = []
+    # Find the <span> element with itemprop="keywords"
+    tags_element = article_page.find('span', itemprop='keywords')
+
+    if tags_element:
+        # Find all <a> tags within the found <span>
+        tag_links = tags_element.find_all('a')
+        for tag_link in tag_links:
+            # Append the text of each <a> tag, stripping any extra whitespace
+            tags.append(tag_link.text.strip())
+
+    return tags
+
+
+def get_article_full_text(article_page):
+    content_div = article_page.find('div', id='mvp-content-main')
+    if content_div:
+        paragraphs = content_div.find_all('p')
+        full_text = ' '.join([paragraph.text.strip() for paragraph in paragraphs])
+        return full_text.replace('\n', '').replace('\t', ' ')
+    else:
+        return "No article content available"
+
+
+def process_article(df, article_url):
+    """Process an article URL and add data to the DataFrame."""
+    logging.info(f"Scraping data from article URL: {article_url}")
+    article_page_content = get_html_content(article_url)
+    article_page = BeautifulSoup(article_page_content, 'html.parser')
+    if article_page:
+        title = get_title(article_page)
+        print(title)
+        content = get_article_full_text(article_page)
+        date = get_date(article_page)
+        category = get_article_category(article_page)
+        tags = get_article_tags(article_page)
+
+        new_row = pd.DataFrame([{
+            "date": date,
+            "title": title,
+            "content": content,
+            "url": article_url,
+            "category": category,
+            "tags": tags
+        }])
+
+        df = pd.concat([df, new_row], ignore_index=True)
+        logging.info(f"Data for {article_url} added to DataFrame")
+        time.sleep(6)
+    else:
+        logging.warning(f"Failed to fetch content from article URL: {article_url}")
+
+    return df
+
