@@ -1,21 +1,15 @@
 import logging
-import requests
 import time
-import os
 import pandas as pd
+from os.path import exists
 from datetime import datetime, timedelta
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException, ElementClickInterceptedException
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.options import Options
 from utills import get_html_content
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -182,3 +176,56 @@ def process_article(df, article_url):
 
     return df
 
+
+def get_all_urls(last_date, last_month_urls):
+    start_date = datetime.now()
+    end_date = last_date
+
+    # Generate monthly page URLs from start_date to end_date
+    monthly_page_urls = generate_monthly_page_urls(start_date, end_date)
+
+    all_urls = []
+    for url in monthly_page_urls:
+        new_urls = fetch_monthly_urls(url, last_month_urls)
+        all_urls.extend(new_urls)
+
+    return all_urls
+
+
+def fetch_all_data_jewish_report(base_url, file_path='jewish_report.csv'):
+    # Check if the file exists to load existing data
+    if exists(file_path):
+        df_existing = pd.read_csv(file_path)
+    else:
+        df_existing = pd.DataFrame(columns=["date", "title", "category", "content", "urls", "tags"])
+
+    # Extract the last date from the existing data
+    if not df_existing.empty:
+        last_date = pd.to_datetime(df_existing['date']).max()
+    else:
+        last_date = datetime.now()
+
+    # Calculate the start date of the last month
+    first_day_of_last_month = (last_date.replace(day=1) - timedelta(days=1)).replace(day=1)
+
+    # Filter the existing URLs for the last month
+    last_month_urls = df_existing[df_existing['date'] >= first_day_of_last_month.strftime('%Y-%m-%d')]['urls'].tolist()
+
+    # Generate URLs for the last month
+    monthly_page_urls = generate_monthly_page_urls(datetime.now(), first_day_of_last_month)
+
+    all_urls = []
+    for url in monthly_page_urls:
+        new_urls = fetch_monthly_urls(url, last_month_urls)
+        all_urls.extend(new_urls)
+
+    df_new = pd.DataFrame(columns=["date", "title", "category", "content", "urls", "tags"])
+    for url in all_urls:
+        df_new = process_article(df_new, url)
+
+    df_combined = pd.concat([df_new, df_existing], ignore_index=True).drop_duplicates(subset=['urls']).reset_index(
+        drop=True)
+
+    df_combined.to_csv(file_path, index=False,encoding='utf-8')
+    print(f"Updated data saved to {file_path}. Total records: {len(df_combined)}")
+    logging.info("Script execution completed jewish_report")
