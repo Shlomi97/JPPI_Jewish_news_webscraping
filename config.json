@@ -1,6 +1,20 @@
 {
   "logging_level": "INFO",
   "websites": {
+
+
+    "jewish_ru": {
+      "base_url": "https://jewish.ru/ru/news/articles/",
+      "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\jewish_ru_news.csv"
+    },
+    "jewish_report": {
+      "base_url": "https://www.sajr.co.za/",
+      "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\jewish_report_articles.csv"
+    },
+    "australian_jewish_news": {
+      "base_url": "https://www.australianjewishnews.com//latest/",
+      "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\australian_jewish_news.csv"
+    },
     "jta": {
       "base_url": "https://www.jta.org/",
       "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\jta_articles.csv"
@@ -16,17 +30,7 @@
     "jewish_news": {
       "base_url": "https://www.jewishnews.co.uk/latest/",
       "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\jewish_news.csv"
-    },
-    "australian_jewish_news": {
-      "base_url": "https://www.australianjewishnews.com//latest/",
-      "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\australian_jewish_news.csv"
-    },
-    "jewish_ru": {
-      "base_url": "https://jewish.ru/ru/news/articles/",
-      "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\jewish_ru_news.csv"
     }
-
-
   },
   "n": 833
 }

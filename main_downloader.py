@@ -5,6 +5,7 @@ from forward_webscrapper import fetch_all_data_forward
 from cjn_webscrapper import fetch_all_data_cjn
 from jewish_news_webscrapper import fetch_all_data_jewish_news
 from jewish_ru import  fetch_all_data_jewish_ru
+from jewish_report_webscrapper import fetch_all_data_jewish_report
 
 
 def main():
@@ -34,3 +35,5 @@ def main():
             fetch_all_data_jewish_news(base_url, output_path)
         if key == "jewish_ru":
             fetch_all_data_jewish_ru(base_url, output_path)
+        if key == "jewish_report":
+            fetch_all_data_jewish_report(base_url, output_path)
