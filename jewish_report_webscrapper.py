@@ -15,17 +15,13 @@ from utills import get_html_content
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-def generate_page_url(year: str, month: str):
-    return f"https://www.sajr.co.za/{year}/{month}/"
-
-
-def generate_monthly_page_urls(start_date, end_date):
+def generate_monthly_page_urls(base_url: str, start_date, end_date):
     urls = []
     current_date = start_date
     while current_date >= end_date:
         year = current_date.year
         month = current_date.month
-        url = f'https://www.sajr.co.za/{year}/{month}/'
+        url = f'{base_url}{year}/{month}/'
         urls.append(url)
         if month == 1:
             current_date = datetime(year - 1, 12, 1)
@@ -33,12 +29,13 @@ def generate_monthly_page_urls(start_date, end_date):
             current_date = datetime(year, month - 1, 1)
     return urls
 
-def fetch_monthly_urls(url, existing_urls=[]):
+
+def fetch_monthly_urls(page_url: str, existing_urls=()):
     """
     Fetches URLs from a given page and returns URLs that are not in the existing_urls list.
 
     Parameters:
-        url (str): The URL of the page to scrape.
+        page_url (str): The URL of the page to scrape.
         existing_urls (list): List of URLs that are already known.
 
     Returns:
@@ -48,7 +45,7 @@ def fetch_monthly_urls(url, existing_urls=[]):
     driver = webdriver.Chrome()
 
     # Open the webpage
-    driver.get(url)
+    driver.get(page_url)
 
     # Initialize the list of URLs
     urls = []
@@ -192,7 +189,7 @@ def get_all_urls(last_date, last_month_urls):
     return all_urls
 
 
-def fetch_all_data_jewish_report(base_url, file_path='jewish_report.csv'):
+def fetch_all_data_jewish_report(base_url, file_path='jewish_report_articles.csv'):
     # Check if the file exists to load existing data
     if exists(file_path):
         df_existing = pd.read_csv(file_path)
@@ -212,7 +209,7 @@ def fetch_all_data_jewish_report(base_url, file_path='jewish_report.csv'):
     last_month_urls = df_existing[df_existing['date'] >= first_day_of_last_month.strftime('%Y-%m-%d')]['urls'].tolist()
 
     # Generate URLs for the last month
-    monthly_page_urls = generate_monthly_page_urls(datetime.now(), first_day_of_last_month)
+    monthly_page_urls = generate_monthly_page_urls(base_url, datetime.now(), first_day_of_last_month)
 
     all_urls = []
     for url in monthly_page_urls:
@@ -226,6 +223,6 @@ def fetch_all_data_jewish_report(base_url, file_path='jewish_report.csv'):
     df_combined = pd.concat([df_new, df_existing], ignore_index=True).drop_duplicates(subset=['urls']).reset_index(
         drop=True)
 
-    df_combined.to_csv(file_path, index=False,encoding='utf-8')
+    df_combined.to_csv(file_path, index=False, encoding='utf-8')
     print(f"Updated data saved to {file_path}. Total records: {len(df_combined)}")
     logging.info("Script execution completed jewish_report")
