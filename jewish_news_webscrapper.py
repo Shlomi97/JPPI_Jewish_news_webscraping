@@ -7,18 +7,10 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import ElementClickInterceptedException, TimeoutException
 from utills import get_html_content
 
 
 def fetch_new_article_urls_until_known(base_url, existing_urls):
-    from selenium import webdriver
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.support.ui import WebDriverWait
-    from selenium.webdriver.support import expected_conditions as EC
-    import time
-    import logging
-
     driver = webdriver.Chrome()  # Adjust the path if necessary
     driver.get(base_url)
     articles_urls = []  # Initialize as a list for preserving order
