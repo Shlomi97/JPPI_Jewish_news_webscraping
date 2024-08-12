@@ -117,3 +117,44 @@ def process_article(df, article_url):
         logging.warning(f"Failed to fetch content from article URL: {article_url}")
 
     return df
+
+def fetch_all_data_jewish_link(base_url, n, file_path='jewish_link.csv'):
+    """Fetch data from pages and articles."""
+    df = read_existing_data(file_path)
+    generated_urls = generate_page_urls(base_url, n)
+    temp_df = pd.DataFrame(
+        columns=["date", "title", "content", "urls", "tags", "category"])  # Initialize a temporary DataFrame
+
+    for url in generated_urls:
+        print(f'main url:{url}')
+        logging.info(f"Processing page URL: {url}")
+        print(f"Processing page URL: {url}")
+        page = get_html_content(url)
+        if page is None:
+            continue
+        articles_urls = get_articles_urls_from_page(url)
+        print(articles_urls)
+        break_outer_loop = False  # Flag to control the outer loop
+        for article_url in articles_urls:
+            print(article_url)
+            if article_url in df['urls'].values:
+                logging.info(f"Article {article_url} already processed. Stopping loop.")
+                break_outer_loop = True
+                break
+            try:
+                temp_df = process_article(temp_df, article_url)
+                print('the df is filling itself',len(temp_df))
+            except Exception as e:
+                logging.error(f"Error processing article {article_url}: {e}")
+        if break_outer_loop:
+            break  # Break out of outer loop
+    temp_df = temp_df.reset_index(drop=True)
+    # Concatenate temp_df with df to maintain the correct order
+    df_combined = pd.concat([temp_df,df], ignore_index=True).reset_index(drop=True)
+
+    # Save the final DataFrame to the specified file path
+    df_combined.to_csv(file_path, index=False,encoding='utf-8')
+
+    logging.info("Script execution completed Jewish Link ")
+
+    return df_combined
