@@ -1,8 +1,10 @@
 {
   "logging_level": "INFO",
   "websites": {
-
-
+    "jewish_link": {
+      "base_url": "https://www.enlacejudio.com/category/noticias/page",
+      "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\jewish_link_news.csv"
+    },
     "jewish_ru": {
       "base_url": "https://jewish.ru/ru/news/articles/",
       "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\jewish_ru_news.csv"
