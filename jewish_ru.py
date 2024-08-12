@@ -95,7 +95,7 @@ def process_article(df, article_url):
             "date": date,
             "title": title,
             "content": content,
-            "url": article_url,
+            "urls": article_url,
             "category": category,
             "tags": tags
         }])

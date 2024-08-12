@@ -123,5 +123,3 @@ def fetch_all_data_jta(base_url, n, file_path='jta'):
     df_combined.to_csv(file_path, index=False)
 
     logging.info("Script execution completed jta ")
-
-    return df
