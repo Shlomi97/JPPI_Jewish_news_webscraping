@@ -2,6 +2,7 @@ import logging
 import requests
 import time
 import os
+import re
 import pandas as pd
 from requests.adapters import HTTPAdapter
 from bs4 import BeautifulSoup
@@ -49,15 +50,6 @@ def get_title(article_page) -> str:
         return "No Title"
 
 
-def get_date(article_page) -> str:
-    date_element = article_page.find('div', class_="ej-single-content__date")
-    if date_element:
-        date = date_element.text.strip()
-        return date
-    else:
-        return None
-
-
 def get_full_article(article_page) -> str:
     content_block = article_page.find('div', class_="editor-style")
     if content_block:
@@ -98,7 +90,8 @@ def process_article(df, article_url):
     if article_page is not None:
         title = get_title(soup)
         content = get_full_article(soup)
-        date = get_date(soup)
+        date = re.search(r'/(\d{4}/\d{2}/\d{2})/', article_url).group(1) \
+            if re.search(r'/(\d{4}/\d{2}/\d{2})/', article_url) else None
         tags = get_tags(soup)
         category = get_categories(soup)
         new_row = pd.DataFrame([{
@@ -117,6 +110,7 @@ def process_article(df, article_url):
         logging.warning(f"Failed to fetch content from article URL: {article_url}")
 
     return df
+
 
 def fetch_all_data_jewish_link(base_url, n, file_path='jewish_link.csv'):
     """Fetch data from pages and articles."""
@@ -143,17 +137,17 @@ def fetch_all_data_jewish_link(base_url, n, file_path='jewish_link.csv'):
                 break
             try:
                 temp_df = process_article(temp_df, article_url)
-                print('the df is filling itself',len(temp_df))
+                print('the df is filling itself', len(temp_df))
             except Exception as e:
                 logging.error(f"Error processing article {article_url}: {e}")
         if break_outer_loop:
             break  # Break out of outer loop
     temp_df = temp_df.reset_index(drop=True)
     # Concatenate temp_df with df to maintain the correct order
-    df_combined = pd.concat([temp_df,df], ignore_index=True).reset_index(drop=True)
+    df_combined = pd.concat([temp_df, df], ignore_index=True).reset_index(drop=True)
 
     # Save the final DataFrame to the specified file path
-    df_combined.to_csv(file_path, index=False,encoding='utf-8')
+    df_combined.to_csv(file_path, index=False, encoding='utf-8')
 
     logging.info("Script execution completed Jewish Link ")
 
