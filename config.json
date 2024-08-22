@@ -9,6 +9,10 @@
       "base_url": "https://jewish.ru/ru/news/articles/",
       "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\jewish_ru_news.csv"
     },
+    "salom_news": {
+      "base_url": "https://www.salom.com.tr/haber/120900/israil-tum-ulkeleri-omicrona-bagli-kirmizi-listeden-cikarma-karari-aldi",
+      "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\salom_news.csv"
+    },
     "jewish_report": {
       "base_url": "https://www.sajr.co.za/",
       "output_path": "C:\\Users\\shlom\\Documents\\Jewish Newspapers Scraping and Analysis\\data\\jewish_report_articles.csv"

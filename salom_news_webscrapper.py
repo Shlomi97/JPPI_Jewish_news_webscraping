@@ -122,7 +122,7 @@ def process_article(df, article_url):
     return df
 
 
-def fetch_all_data_jewish_ru(base_url, file_path='salom_news.csv'):
+def fetch_all_data_salom_news(base_url, file_path='salom_news.csv'):
     if exists(file_path):
         df_existing = pd.read_csv(file_path)
     else:

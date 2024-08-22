@@ -7,11 +7,11 @@ from jewish_news_webscrapper import fetch_all_data_jewish_news
 from jewish_ru import  fetch_all_data_jewish_ru
 from jewish_report_webscrapper import fetch_all_data_jewish_report
 from jewish_link_webscrapper import fetch_all_data_jewish_link
-
+from salom_news_webscrapper import fetch_all_data_salom_news
 
 def main():
     # Load configuration
-    with open('config.json', 'r') as config_file:
+    with open('config_2.json', 'r') as config_file:
         config = json.load(config_file)
 
     # Set up logging configurations
@@ -40,3 +40,5 @@ def main():
             fetch_all_data_jewish_report(base_url, output_path)
         if key == "jewish_link":
             fetch_all_data_jewish_link(base_url,n,output_path)
+        if key == "salom_news":
+            fetch_all_data_salom_news(base_url,output_path)
