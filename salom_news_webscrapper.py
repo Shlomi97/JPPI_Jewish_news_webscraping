@@ -1,7 +1,7 @@
 import logging
 import requests
 import time
-import os
+from os.path import exists
 import pandas as pd
 from requests.adapters import HTTPAdapter
 from bs4 import BeautifulSoup
@@ -122,4 +122,20 @@ def process_article(df, article_url):
     return df
 
 
-
+def fetch_all_data_jewish_ru(base_url, file_path='salom_news.csv'):
+    if exists(file_path):
+        df_existing = pd.read_csv(file_path)
+    else:
+        df_existing = pd.DataFrame(columns=["date", "title", "content", "url", "category", "tags"])
+    df_new = pd.DataFrame(columns=["date", "title", "content", "urls", "category", "tags"])
+    last_url = df_existing['url'].iloc[0] if len(df_existing) > 0 else base_url
+    while last_url:
+        last_url = get_next_url(last_url)
+        time.sleep(7)
+        df_new = process_article(df_new, last_url)
+    df_existing['date'] = pd.to_datetime(df_existing['date'], errors='coerce')
+    df_new['date'] = pd.to_datetime(df_new['date'], errors='coerce')
+    df = pd.concat([df_new, df_existing], ignore_index=True)
+    print(f"Updated data saved to {file_path}. Total records: {len(df)}")
+    logging.info(f"Script execution complete salom news")
+    return df
