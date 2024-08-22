@@ -135,6 +135,7 @@ def fetch_all_data_jewish_ru(base_url, file_path='jewish_ru.csv'):
                     logging.info("404 Page encountered.")
                     consecutive_404_count += 1
                     if consecutive_404_count == 7:
+                        df_existing['date'] = pd.to_datetime(df_existing['date'], errors='coerce')
                         df_new['date'] = pd.to_datetime(df_new['date'], format='%d.%m.%Y')
                         df = pd.concat([df_new, df_existing], ignore_index=True)
                         break  # Exit loop if three consecutive 404 errors occur

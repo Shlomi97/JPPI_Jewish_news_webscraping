@@ -148,6 +148,8 @@ def fetch_all_data_forward(base_url, file_path='forward.csv'):
     df_new = pd.DataFrame(columns=["date", "title", "category", "content", "urls", "tags", "authors"])
     for url in new_urls:
         df_new = process_article(df_new, url)
+    df_existing['date'] = pd.to_datetime(df_existing['date'],errors='coerce')
+    df_new['date'] = pd.to_datetime(df_new['date'], errors='coerce')
     df_combined = pd.concat([df_new,df_existing],ignore_index=True).drop_duplicates(subset=['urls']).reset_index(drop=True)
 
     df_combined.to_csv(file_path, index=False)

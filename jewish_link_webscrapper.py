@@ -114,9 +114,9 @@ def process_article(df, article_url):
 
 def fetch_all_data_jewish_link(base_url, n, file_path='jewish_link.csv'):
     """Fetch data from pages and articles."""
-    df = read_existing_data(file_path)
+    df_existing = read_existing_data(file_path)
     generated_urls = generate_page_urls(base_url, n)
-    temp_df = pd.DataFrame(
+    df_new = pd.DataFrame(
         columns=["date", "title", "content", "urls", "tags", "category"])  # Initialize a temporary DataFrame
 
     for url in generated_urls:
@@ -131,21 +131,22 @@ def fetch_all_data_jewish_link(base_url, n, file_path='jewish_link.csv'):
         break_outer_loop = False  # Flag to control the outer loop
         for article_url in articles_urls:
             print(article_url)
-            if article_url in df['urls'].values:
+            if article_url in df_existing['urls'].values:
                 logging.info(f"Article {article_url} already processed. Stopping loop.")
                 break_outer_loop = True
                 break
             try:
-                temp_df = process_article(temp_df, article_url)
-                print('the df is filling itself', len(temp_df))
+                df_new = process_article(df_new, article_url)
+                print('the df is filling itself', len(df_new))
             except Exception as e:
                 logging.error(f"Error processing article {article_url}: {e}")
         if break_outer_loop:
             break  # Break out of outer loop
-    temp_df = temp_df.reset_index(drop=True)
+    df_new = df_new.reset_index(drop=True)
     # Concatenate temp_df with df to maintain the correct order
-    df_combined = pd.concat([temp_df, df], ignore_index=True).reset_index(drop=True)
-
+    df_existing['date'] = pd.to_datetime(df_existing['date'],errors='coerce')
+    df_new['date'] = pd.to_datetime(df_new['date'], errors='coerce')
+    df_combined = pd.concat([df_new, df_existing], ignore_index=True).reset_index(drop=True)
     # Save the final DataFrame to the specified file path
     df_combined.to_csv(file_path, index=False, encoding='utf-8')
 

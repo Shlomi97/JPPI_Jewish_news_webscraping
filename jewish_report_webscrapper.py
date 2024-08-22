@@ -219,7 +219,8 @@ def fetch_all_data_jewish_report(base_url, file_path='jewish_report_articles.csv
     df_new = pd.DataFrame(columns=["date", "title", "category", "content", "urls", "tags"])
     for url in all_urls:
         df_new = process_article(df_new, url)
-
+    df_existing['date'] = pd.to_datetime(df_existing['date'],errors='coerce')
+    df_new['date'] = pd.to_datetime(df_new['date'], errors='coerce')
     df_combined = pd.concat([df_new, df_existing], ignore_index=True).drop_duplicates(subset=['urls']).reset_index(
         drop=True)
 
